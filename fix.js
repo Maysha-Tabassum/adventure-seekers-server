@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 //app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.deqifab.mongodb.net/unique-travels?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.deqifab.mongodb.net/db_adventure?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 const client = new MongoClient(uri,
@@ -50,7 +50,7 @@ async function run() {
             res.json(result);
         });
 
-        // get all users
+        // get all users 
         app.get('/users', async (req, res) => {
             const result = await collectionUser.find({}).toArray();
             res.send(result);
@@ -68,7 +68,7 @@ async function run() {
             res.json(result);
         });
 
-        // Get a single user
+        // Get a single user 
         app.get('/users/:email', async (req, res) => {
             const userEmail = req.params.email;
             const query = { email: userEmail };
@@ -76,7 +76,7 @@ async function run() {
             res.send(userInfo);
         });
 
-        // make admin existing user
+        // make admin existing user 
         app.put('/makeAdmin', async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
@@ -92,16 +92,16 @@ async function run() {
         });
 
         /* --------------------------
-            Doctors part start
+            Doctors part start 
         --------------------------- */
-        // create or insert doctors to database
+        // create or insert doctors to database 
         app.post('/buses', async (req, res) => {
             const buses = req.body;
             const result = await collectionBuses.insertOne(buses);
             res.json(result);
         });
 
-        // get all data from server
+        // get all data from server 
         app.get('/buses', async (_req, res) => {
             const result = await collectionBuses.find({}).toArray();
             res.send(result);
@@ -150,9 +150,9 @@ async function run() {
         });
 
         /* --------------------------
-            booking part start
+            booking part start 
         --------------------------- */
-        // create or insert a service to database
+        // create or insert a service to database 
         app.post('/bookings', async (req, res) => {
             const bookData = req.body;
             try {
@@ -180,7 +180,7 @@ async function run() {
             }
         });
 
-        // get all booking data from server
+        // get all booking data from server 
         app.get('/bookings', async (_req, res) => {
             const result = await collectionBookings.find({}).toArray();
             res.send(result);
@@ -251,7 +251,6 @@ async function run() {
         // await client.close();
     }
 }
-
 run().catch(console.dir);
 
 

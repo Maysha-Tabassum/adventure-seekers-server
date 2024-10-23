@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 //app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.deqifab.mongodb.net/unique-travels?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.deqifab.mongodb.net/db_adventure?retryWrites=true&w=majority&appName=Cluster0`;
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 const client = new MongoClient(uri,
@@ -29,10 +29,12 @@ const client = new MongoClient(uri,
 
 async function run() {
     try {
-        // Connect the client to the server (only once)
+
+        // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
 
         // connect mongodb and create collections
+        client.connect();
         const database = client.db('unique-travels');
         const collectionUser = database.collection('users');
         const collectionBuses = database.collection('buses');
@@ -45,12 +47,12 @@ async function run() {
         //collection a new user when register
         app.post('/users', async (req, res) => {
             const user = req.body;
-            console.log(user);
+            console.log(user)
             const result = await collectionUser.insertOne(user);
             res.json(result);
-        });
+        })
 
-        // get all users
+        // get all users 
         app.get('/users', async (req, res) => {
             const result = await collectionUser.find({}).toArray();
             res.send(result);
@@ -64,11 +66,11 @@ async function run() {
             const UserDoc = {
                 $set: user,
             };
-            const result = await collectionUser.updateOne(filter, UserDoc, options);
-            res.json(result);
-        });
+            const result = await collectionUser.updateOne(filter, UserDoc, options)
+            res.json(result)
+        })
 
-        // Get a single user
+        // Get a single user 
         app.get('/users/:email', async (req, res) => {
             const userEmail = req.params.email;
             const query = { email: userEmail };
@@ -76,7 +78,8 @@ async function run() {
             res.send(userInfo);
         });
 
-        // make admin existing user
+
+        // make admin existing user 
         app.put('/makeAdmin', async (req, res) => {
             const user = req.body;
             const filter = { email: user.email };
@@ -86,22 +89,23 @@ async function run() {
                     $set: user,
                 };
                 const result = await collectionUser.updateOne(filter, UserDoc);
-                res.json(result);
+                res.json(result)
             }
-            res.json();
-        });
+            res.json()
+        })
+
 
         /* --------------------------
-            Doctors part start
+            Doctors part start 
         --------------------------- */
-        // create or insert doctors to database
+        // create or insert doctors to database 
         app.post('/buses', async (req, res) => {
             const buses = req.body;
             const result = await collectionBuses.insertOne(buses);
             res.json(result);
         });
 
-        // get all data from server
+        // get all data from server 
         app.get('/buses', async (_req, res) => {
             const result = await collectionBuses.find({}).toArray();
             res.send(result);
@@ -150,9 +154,9 @@ async function run() {
         });
 
         /* --------------------------
-            booking part start
+            booking part start 
         --------------------------- */
-        // create or insert a service to database
+        // create or insert a service to database 
         app.post('/bookings', async (req, res) => {
             const bookData = req.body;
             try {
@@ -180,7 +184,7 @@ async function run() {
             }
         });
 
-        // get all booking data from server
+        // get all booking data from server 
         app.get('/bookings', async (_req, res) => {
             const result = await collectionBookings.find({}).toArray();
             res.send(result);
@@ -193,6 +197,7 @@ async function run() {
             const booking = await collectionBookings.find(query).toArray();
             res.send(booking);
         });
+
 
         // mail send using node mailer
         // Configure nodemailer transporter
@@ -243,15 +248,15 @@ async function run() {
             }
         });
 
+
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
-        // Optionally close the client after server stops (not necessary here)
-        // await client.close();
+        // Ensures that the client will close when you finish/error
+        await client.close();
     }
 }
-
 run().catch(console.dir);
 
 
